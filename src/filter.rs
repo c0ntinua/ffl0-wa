@@ -3,9 +3,7 @@ pub struct Touch {
     pub col : i32,
     pub value : f64,
 }
-
 pub type Filter = Vec<Touch>;
-
 pub fn random_filter(height : i32, width : i32, power : f64) -> Filter {
     let mut filter = vec!();
     debug_assert!(height%2 == 1 && width%2 == 1);

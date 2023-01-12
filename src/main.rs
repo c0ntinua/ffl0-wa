@@ -2,10 +2,9 @@ mod curses; use curses::*;
 mod filter; use filter::*;
 mod state; use state::*;
 use std::env;    
-
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut default_settings: Vec<usize> =vec![50,100,7,5,20,3000];
+    let mut default_settings: Vec<usize> =vec![25,50,7,5,20,3000,500];
     for i in 0..default_settings.len() {
         if i < args.len() - 1 {
             let parsed = match args[i+1].parse::<usize>() {
@@ -23,30 +22,36 @@ fn main() {
     let span = default_settings[3] as i32;
     let flux = default_settings[4];
     let updates = default_settings[5];
-    let mut reps = 3000;
+    let duration = default_settings[6];
+    let right = 10;
+    let down = 10;
     clear_screen();
     hide_cursor();
     let mut filter_system = simple_random_filters(filters,span,span,2.0);
     let mut state = random_state(rows, cols);
-    cursor_to(1,1);
-    print!("fflo {} {} {} {} {} {}", rows, cols, filters, span, flux, updates);
-    loop {
-        for _ in 0..reps {
+    
+    
+    for i in 0..duration {
+        for _ in 0..updates {
+
             let row =  rand::random::<usize>() % rows;
             let col =  rand::random::<usize>() % cols;
             for f in &filter_system {
                 filter_state_mutate_cell(&f, &mut state, row, col, rows, cols);
             }
-
         }
-
- 
-        display(&state, rows, cols);
+        
+        display(&state, rows, cols, down, right);
+        set_color(255,255,255);
+        cursor_to(down,right);
+        print!("fflo {} {} {} {} {} {} {}", rows, cols, filters, span, flux, updates, duration-i);
         if rand::random::<usize>()%1000 < flux {
-            filter_system = simple_random_filters(filters,span,span,0.2 + rand::random::<f64>());
+            filter_system = simple_random_filters(filters,span,span,0.5 + 0.5*rand::random::<f64>());
         }
-        // if rand::random::<usize>()%2000 < flux {
-        //     state = random_state(rows, cols);
-        // }
+
+        
+
     }
+    reset();
+
 }
